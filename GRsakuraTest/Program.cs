@@ -1,3 +1,4 @@
+using System;
 using Microsoft.SPOT.Hardware;
 using System.Threading;
 
@@ -5,34 +6,33 @@ namespace GRsakuraTest
 {
     public class Program
     {
-        //GR-SAKURA (LED1 0x50, LED2 0x51, LED3 0x52, LED4 0x56)
-        private const Cpu.Pin LED1Pin = (Cpu.Pin)0x50; //LED1
-        private const Cpu.Pin LED2Pin = (Cpu.Pin)0x51; //LED2
-        private const Cpu.Pin LED3Pin = (Cpu.Pin)0x52; //LED2
-        private const Cpu.Pin LED4Pin = (Cpu.Pin)0x56; //LED4
         public static void Main()
         {
-            var led1 = new OutputPort(LED1Pin, false);
-            var led2 = new OutputPort(LED2Pin, false);
-            var led3 = new OutputPort(LED3Pin, false);
-            var led4 = new OutputPort(LED4Pin, false);
+            const int SleepTime = 500; //const ‚ÍPascal
+            
+            //GR-SAKURA on board LED pin (LED1 0x50, LED2 0x51, LED3 0x52, LED4 0x56)
+            Cpu.Pin[] ledPins = { (Cpu.Pin)0x50, (Cpu.Pin)0x51, (Cpu.Pin)0x52, (Cpu.Pin)0x56 };
+
+            OutputPort[] leds = { new OutputPort(ledPins[0], false),
+                                  new OutputPort(ledPins[1], false),
+                                  new OutputPort(ledPins[2], false),
+                                  new OutputPort(ledPins[3], false) };
+
             (new Thread(() =>
             {
                 while (true)
                 {
-                    led1.Write(false);
-                    led2.Write(false);
-                    led3.Write(false);
-                    led4.Write(false);
-                    Thread.Sleep(1000);
-                    led1.Write(true);
-                    Thread.Sleep(1000);
-                    led2.Write(true);
-                    Thread.Sleep(1000);
-                    led3.Write(true);
-                    Thread.Sleep(1000);
-                    led4.Write(true);
-                    Thread.Sleep(1000);
+                    foreach(OutputPort led in leds)
+                    {
+                        led.Write(false);
+                    }
+
+                    foreach (OutputPort led in leds)
+                    {
+                        Thread.Sleep(SleepTime);
+                        led.Write(true);
+                    }
+                    Thread.Sleep(SleepTime);
                 }
             })).Start();
         }
